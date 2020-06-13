@@ -18,7 +18,9 @@ white = (255, 255, 255)
 black = (0,0,0)
 red = (255,0,0)
 blue  = (0,0,255)
-green = (0,255,100)
+green = (0,255,0)
+yellow = (0,255,255)
+grey=(200,200,200)
 (width, height) = (720, 720)
 fps = 30
 
@@ -59,7 +61,7 @@ class Matrix():
     def draw_matrix(self):
         i = 0
         j = 0
-        p.draw.rect(screen,white,(self.draw_start[0],self.draw_start[1],450,450))
+        p.draw.rect(screen,grey,(self.draw_start[0],self.draw_start[1],450,450))
         largeText = p.font.Font('freesansbold.ttf',20)
         while i<9:
             j=0
@@ -88,8 +90,22 @@ class Matrix():
                 self.matrix[i][j]=0
                 
     def draw_focus(self,i,j):
-        p.draw.rect(screen,blue,(self.draw_start[0]+(j)*50+3,self.draw_start[1]+ (i)*50+3,44,44),2)
-        p.draw.rect(screen,green,(self.draw_start[0]+(j)*50+3-50,self.draw_start[1]+(i)*50+3-50,44+100,44+100),2)
+        p.draw.rect(screen,green,(self.draw_start[0]+(j)*50+3,self.draw_start[1]+ (i)*50+3,44,44),2)
+        
+        #Getting Column focus
+        p.draw.rect(screen,blue,(self.draw_start[0]+(j)*50-6,self.draw_start[1]-6,62,462),2)
+        #Getting Row Focus
+        p.draw.rect(screen,blue,(self.draw_start[0]-6,self.draw_start[1]+(i)*50-6,462,62),2)
+        
+        #Current square
+        start_i = int(i/3)*3
+        start_j = int(j/3)*3
+        print(start_i,start_j)
+        
+        p.draw.rect(screen,yellow,(self.draw_start[0]+(start_j)*50-3,self.draw_start[0]+(start_i)*50-3,156,156),2)
+        
+        
+        #p.draw.rect(screen,green,(self.draw_start[0]+(j)*50+3-50,self.draw_start[1]+(i)*50+3-50,44+100,44+100),2)
     def take_input(self,mouse):
         if mouse[0]>self.draw_start[0] and mouse[0] < self.draw_start[0]+450 and mouse[1] > self.draw_start[1] and mouse[1]< self.draw_start[1]+450:
             x = mouse[0] - self.draw_start[0]
@@ -98,7 +114,7 @@ class Matrix():
             y = int(y/50)
             i =y
             j =x
-            p.draw.rect(screen,blue,(self.draw_start[0]+(j)*50+3,self.draw_start[1]+ (i)*50+3,44,44),2)
+            p.draw.rect(screen,green,(self.draw_start[0]+(j)*50+3,self.draw_start[1]+ (i)*50+3,44,44),2)
             events = p.event.get()
             for event in events:
                 if event.type == p.KEYDOWN:

@@ -8,7 +8,33 @@ Created on Fri Apr 24 17:41:03 2020
 import threading
 import time
 
-
+def get_focus_data(matrix,focus):
+    data = []
+    data.append(focus)
+    square = (int(focus[0]/3)*3,int(focus[1]/3)*3)
+    data.append(square)
+    row1 = matrix[square[0]]
+    row2 = matrix[square[0]+1]
+    row3 = matrix[square[0]+2]
+    col1 = [matrix[x][square[1]] for x in range(0,9)]
+    col2 = [matrix[x][square[1]+1] for x in range(0,9)]
+    col3 = [matrix[x][square[1]+2] for x in range(0,9)]
+    row1[:] = [x for x in row1 if x != 0]
+    row2[:] = [x for x in row2 if x != 0]
+    row3[:] = [x for x in row3 if x != 0]
+    col1[:] = [x for x in col1 if x != 0]
+    col2[:] = [x for x in col2 if x != 0]
+    col3[:] = [x for x in col3 if x != 0]
+    data.append(row1)
+    data.append(row2)
+    data.append(row3)
+    data.append(col1)
+    data.append(col2)
+    data.append(col3)
+    return data
+    
+    
+    
 '''
 Template for strategy class
 
