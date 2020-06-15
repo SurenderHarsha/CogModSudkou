@@ -64,6 +64,12 @@ def get_focus_data(matrix,focus):
     data.append(co1)
     data.append(co2)
     data.append(co3)
+    empty_sqr= []
+    for i in range(square[0],square[0]+3):
+        for j in range(square[1],square[1]+3):
+            if matrix[i][j]==0:
+                empty_sqr.append((i,j))
+    data.append(empty_sqr)
     return data
     
     
