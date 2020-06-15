@@ -12,25 +12,58 @@ def get_focus_data(matrix,focus):
     data = []
     data.append(focus)
     square = (int(focus[0]/3)*3,int(focus[1]/3)*3)
-    data.append(square)
+    sqr = {}
+    for i in range(square[0],square[0]+3):
+        for j in range(square[1],square[1]+3):
+            if matrix[i][j]!=0:
+                sqr[matrix[i][j]]=(i,j)
+                
+    
+    data.append(sqr)
+    
+    
     row1 = matrix[square[0]]
     row2 = matrix[square[0]+1]
     row3 = matrix[square[0]+2]
     col1 = [matrix[x][square[1]] for x in range(0,9)]
     col2 = [matrix[x][square[1]+1] for x in range(0,9)]
     col3 = [matrix[x][square[1]+2] for x in range(0,9)]
-    row1[:] = [x for x in row1 if x != 0]
-    row2[:] = [x for x in row2 if x != 0]
-    row3[:] = [x for x in row3 if x != 0]
-    col1[:] = [x for x in col1 if x != 0]
-    col2[:] = [x for x in col2 if x != 0]
-    col3[:] = [x for x in col3 if x != 0]
-    data.append(row1)
-    data.append(row2)
-    data.append(row3)
-    data.append(col1)
-    data.append(col2)
-    data.append(col3)
+    rw1 = {}
+    for i in range(len(row1)):
+        if row1[i]!=0:
+            rw1[row1[i]]=(square[0],i)
+    
+    rw2 = {}
+    for i in range(len(row2)):
+        if row2[i]!=0:
+            rw2[row2[i]]=(square[0]+1,i)
+    rw3 = {}
+    for i in range(len(row3)):
+        if row3[i]!=0:
+            rw3[row3[i]]=(square[0]+2,i)
+            
+            
+    co1 = {}
+    for i in range(len(col1)):
+        if col1[i]!=0:
+            co1[col1[i]]=(i,square[1])
+            
+            
+            
+    co2 = {}
+    for i in range(len(col2)):
+        if col2[i]!=0:
+            co2[col2[i]]=(i,square[1]+1)
+    co3 = {}
+    for i in range(len(col3)):
+        if col3[i]!=0:
+            co3[col3[i]]=(i,square[1]+2)
+    data.append(rw1)
+    data.append(rw2)
+    data.append(rw3)
+    data.append(co1)
+    data.append(co2)
+    data.append(co3)
     return data
     
     
