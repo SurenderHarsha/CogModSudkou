@@ -196,7 +196,7 @@ def two_out_of_three_rule(focus,square,row1,row2,row3,col1,col2,col3,empty_sqr):
                 if empty_cell_number not in empty_cell_no_possible_values:
                     empty_cell_possible_values = np.append(empty_cell_possible_values,empty_cell_number)
                     
-            if number in empty_cell_possible_values:
+            if number not in empty_cell_possible_values:
                 solved = False
         
         if solved == True:
