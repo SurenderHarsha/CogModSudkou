@@ -116,8 +116,8 @@ def strategy_cycle(focus,square,r1,r2,r3,c1,c2,c3,empty_sqr):
             perceived_ocrr = perceived_numbers(focus_row,focus)
             perceived_ocrc = perceived_numbers(focus_column,focus)
             perceived_osr = perceived_numbers(square,focus)
-            perceived_spr = perceived_ocrr + perceived_ocrc
-            perceived_mspr = perceived_spr + perceived_osr
+            perceived_spr = (perceived_ocrr + perceived_ocrc)/2
+            perceived_mspr = (perceived_ocrr + perceived_ocrc + perceived_osr)/3
             
             rankings = (perceived_ocrr,perceived_ocrc,perceived_osr,perceived_spr,perceived_mspr)
             sorted_ranking = sorted(rankings)[::-1]
