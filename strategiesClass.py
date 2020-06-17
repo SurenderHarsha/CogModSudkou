@@ -368,6 +368,7 @@ class Basic():
                 done = True
                 continue
             choice = np.random.choice(list(range(len(empty_cells))))
+            
             new_cell = empty_cells[choice]
             self.find_focus_path(self.focus[0],self.focus[1],new_cell[0],new_cell[1])
             self.focus = new_cell
@@ -377,14 +378,26 @@ class Basic():
             n,s = strategy_cycle(dt[0],dt[1],dt[2],dt[3],dt[4],dt[5],dt[6],dt[7],dt[8])
             if n==False:
                 continue
-            print(s)
+            #print(s)
+            x = self.focus[0]
+            y= self.focus[1]
             
             self.matrix[self.focus[0]][self.focus[1]] = s
-            time.sleep(2)
-            self.perform_check()
-            if self.focus in empty_cells:
-                empty_cells.remove(self.focus)
             
+            empty_cells.remove(self.focus)
+            time.sleep(2)
+            
+            result = self.perform_check()
+            if result == -1:
+                self.find_focus_path(self.focus[0],self.focus[1],x,y)
+                self.matrix[x][y] = 0
+                
+                empty_cells.append((x,y))
+                print("Wrong Answer!")
+            continue
+            
+            
+            print(len(empty_cells))
             
         return
             
@@ -407,7 +420,7 @@ class Strategy():
         self.name = name
     def return_strategy(self,matrix):
         if self.name == 'Easy':
-            obj = Basic(matrix)
+            obj = Basic(matrix.copy())
         
         if self.name == "Second":
             #Create the object for second strategy

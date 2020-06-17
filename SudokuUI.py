@@ -26,6 +26,9 @@ blue  = (0,0,255)
 green = (0,255,0)
 yellow = (0,255,255)
 grey=(200,200,200)
+selected_location = []
+
+
 (width, height) = (720, 720)
 fps = 30
 
@@ -63,8 +66,17 @@ class Matrix():
     def __init__(self,matrix):
         self.matrix = matrix
         self.draw_start = (135,135)
+        self.matrix_drew = False
         
-        
+    def matrix_drawn(self):
+        global selected_location
+        self.matrix_drew = True
+        selected_location = [x[:] for x in self.matrix]
+        for i in range(9):
+            for j in range(9):
+                if selected_location[i][j]!=0:
+                    #print("Marking")
+                    selected_location[i][j]=1
     def load_file(self):
         global file_to_load
         print(file_to_load)
@@ -77,6 +89,7 @@ class Matrix():
                 k+=1
         
     def draw_matrix(self):
+        global selected_location
         i = 0
         j = 0
         p.draw.rect(screen,grey,(self.draw_start[0],self.draw_start[1],450,450))
@@ -99,7 +112,14 @@ class Matrix():
             for j in range(9):
                 if self.matrix[i][j] == 0:
                     continue
-                TextSurf, TextRect = text_objects(str(self.matrix[i][j]), largeText,black)
+                
+                if self.matrix_drew:
+                    if selected_location[i][j] == 1:
+                        TextSurf, TextRect = text_objects(str(self.matrix[i][j]), largeText,black)
+                    else:
+                        TextSurf, TextRect = text_objects(str(self.matrix[i][j]), largeText,blue)
+                else:
+                    TextSurf, TextRect = text_objects(str(self.matrix[i][j]), largeText,black)
                 TextRect.center = (self.draw_start[0]+(j)*50+25,self.draw_start[1]+ (i)*50+25)
                 screen.blit(TextSurf, TextRect)
     def refresh(self):
@@ -267,7 +287,7 @@ def run_ui():
                   
     agent = Strategy(selected_strategy)
     print(file_to_load)
-    
+    once = True
     input_s = p.image.load('inputS.png')
     while MainGame:
         mouse = p.mouse.get_pos()
@@ -283,10 +303,17 @@ def run_ui():
             m.take_input(mouse)
             
         if matrix_created==True and agent_created==False:
+            print(m.matrix)
+            m.matrix_drawn()
+            print(m.matrix)
             agent = agent.return_strategy(m.matrix)
             agent_created = True
             
         if matrix_created == True and agent_created == True:
+            if once:
+                #print(agent.matrix)
+                #print(m.matrix)
+                once = False
             m.matrix = agent.matrix
             out = agent.get_focus()
             m.draw_focus(out[0],out[1])
