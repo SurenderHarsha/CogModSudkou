@@ -23,11 +23,11 @@ def get_column_row_focus(focus,square,row1,row2,row3,col1,col2,col3):
         focus_row = row3
         
     if focus_column_index == 0:
-        focus_column = column1
+        focus_column = col1
     elif focus_column_index == 1:
-        focus_column = column2
+        focus_column = col2
     elif focus_column_index == 2:
-        focus_column = column3
+        focus_column = col3
         
     return focus_column, focus_row
 
@@ -39,7 +39,7 @@ def get_column_row_focus(focus,square,row1,row2,row3,col1,col2,col3):
 ## a single cell is empty and its value.
 def only_choice_rule_column(focus,square,row1,row2,row3,col1,col2,col3):
     cells,_ = get_column_row_focus(focus,square,row1,row2,row3,col1,col2,col3)
-    numbers = cells.get_keys()
+    numbers = list(cells.keys())
     solved = False
     solution = 0
     ## If the size of the values vector is 8, we can identify which value
@@ -62,7 +62,7 @@ def only_choice_rule_column(focus,square,row1,row2,row3,col1,col2,col3):
 ## a single cell is empty and its value.
 def only_choice_rule_row(focus,square,row1,row2,row3,col1,col2,col3):
     _,cells = get_column_row_focus(focus,square,row1,row2,row3,col1,col2,col3)
-    numbers = cells.get_keys()
+    numbers = list(cells.keys())
     solved = False
     solution = 0
     ## If the size of the values vector is 8, we can identify which value
@@ -89,7 +89,7 @@ def single_possibility_rule(focus,square,row1,row2,row3,col1,col2,col3):
     solution = 0
     
     ## We create a vector with the unique values of the row+column combination.
-    values = np.append(row.get_keys(),column.get_keys())
+    values = np.append(list(row.keys()),list(column.keys()))
     values = np.unique(values)
     
     ## If the size of the values vector is 8, we can identify which value
@@ -112,7 +112,7 @@ def single_possibility_rule(focus,square,row1,row2,row3,col1,col2,col3):
 ## This function recieves as input a square to check if only
 ## a single cell is empty and its value.
 def only_square_rule(focus,square,row1,row2,row3,col1,col2,col3):
-    numbers = square.get_keys()
+    numbers = list(square.keys())
     solved = False
     solution = 0
     ## If the size of the values vector is 8, we can identify which value
@@ -139,8 +139,8 @@ def mixed_single_possibility_rule(focus,square,row1,row2,row3,col1,col2,col3):
     
     ## We create a vector with the unique values of the row+column combination.
     column,row = get_column_row_focus(focus,square,row1,row2,row3,col1,col2,col3)
-    values = np.append(row.get_keys(),column.get_keys())
-    values = np.append(value,square.get_keys())
+    values = np.append(list(row.keys()),list(column.keys()))
+    values = np.append(values,list(square.keys()))
     values = np.unique(values)
     
     ## If the size of the values vector is 8, we can identify which value
@@ -172,8 +172,9 @@ def two_out_of_three_rule(focus,square,row1,row2,row3,col1,col2,col3,empty_sqr):
     all_possible_values = list(range(1, 10))
     focus_possible_values = np.empty(0, int)    
     
-    focus_no_possible_values = np.append(focus_row,focus_column)
-    focus_no_possible_values = np.append(focus_no_possible_values,square.get_keys())
+    focus_no_possible_values = np.append(list(focus_row.keys()),list(focus_column.keys()))
+    focus_no_possible_values = np.append(focus_no_possible_values,list(square.keys()))
+    #print(focus_no_possible_values)
     focus_no_possible_values = np.unique(focus_no_possible_values)
     
     for number in all_possible_values:
@@ -183,12 +184,12 @@ def two_out_of_three_rule(focus,square,row1,row2,row3,col1,col2,col3,empty_sqr):
     for number in focus_possible_values:
         solved = True
         
-        for _,coord in empty_sqr.items():
+        for coord in empty_sqr:
             
             empty_cell_possible_values = np.empty(0, int)
             empty_cell_column,empty_cell_row = get_column_row_focus(coord,square,row1,row2,row3,col1,col2,col3)
-            empty_cell_no_possible_values = np.append(empty_cell_row,empty_cell_column)
-            empty_cell_no_possible_values = np.append(empty_cell_no_possible_values,square.get_keys())
+            empty_cell_no_possible_values = np.append(list(empty_cell_row.keys()),list(empty_cell_column.keys()))
+            empty_cell_no_possible_values = np.append(empty_cell_no_possible_values,list(square.keys()))
             empty_cell_no_possible_values = np.unique(empty_cell_no_possible_values)
             
             for empty_cell_number in all_possible_values:

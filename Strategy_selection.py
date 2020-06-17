@@ -104,7 +104,8 @@ chunk = chunk_simple ## We define the first strategy, the initial one.
 number_solved = False ## This will be calculated with the logic of the program.
 
 ## The function that will be used for the main program
-def strategy_cicle(focus,square,r1,r2,r3,c1,c2,c3):
+def strategy_cycle(focus,square,r1,r2,r3,c1,c2,c3,empty_sqr):
+        global chunk,number_solved
         chunk,strategy_name = next_step(chunk,number_solved)
         solution = 0
         
@@ -119,17 +120,17 @@ def strategy_cicle(focus,square,r1,r2,r3,c1,c2,c3):
             perceived_mspr = perceived_spr + perceived_osr
             
             rankings = (perceived_ocrr,perceived_ocrc,perceived_osr,perceived_spr,perceived_mspr)
-            sorted_ranking = sort(rankings)[::-1]
+            sorted_ranking = sorted(rankings)[::-1]
             
             for strat in sorted_ranking:
                 strategy_name_index = rankings.index(strat)
-                strategy_name = simple_strategies_list(strategy_name_index)
+                strategy_name = simple_strategies_list[strategy_name_index]
                 number_solved,solution = strategy_name(focus,square,r1,r2,r3,c1,c2,c3)
                 if number_solved == True:
                     break
             
         if strategy_name == 'medium_strategies':
-            number_solved,solution = two_out_of_three_rule(focus,square,r1,r2,r3,c1,c2,c3)
-            
+            number_solved,solution = two_out_of_three_rule(focus,square,r1,r2,r3,c1,c2,c3,empty_sqr)
+        print(strategy_name)
         return number_solved,solution
 

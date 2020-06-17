@@ -6,12 +6,17 @@ Created on Fri Apr 24 12:19:40 2020
 """
 
 import pygame as p
-
+import pandas as pd
+import numpy as np
 import time
-from strategies import *
+from strategiesClass import *
 
 
 selected_strategy = ""
+easy_files = "Easy_Sudokus.csv"
+medium_files = "mediumsudoku.csv"
+file_to_load = ""
+
 
 
 white = (255, 255, 255) 
@@ -58,6 +63,19 @@ class Matrix():
     def __init__(self,matrix):
         self.matrix = matrix
         self.draw_start = (135,135)
+        
+        
+    def load_file(self):
+        global file_to_load
+        print(file_to_load)
+        df = pd.read_csv(file_to_load)
+        l = df.loc[np.random.choice(list(range(df.shape[0])))][1:].to_list()
+        k = 0
+        for i in range(9):
+            for j in range(9):
+                self.matrix[i][j] = l[k]
+                k+=1
+        
     def draw_matrix(self):
         i = 0
         j = 0
@@ -100,7 +118,7 @@ class Matrix():
         #Current square
         start_i = int(i/3)*3
         start_j = int(j/3)*3
-        print(start_i,start_j)
+        #print(start_i,start_j)
         
         p.draw.rect(screen,yellow,(self.draw_start[0]+(start_j)*50-3,self.draw_start[0]+(start_i)*50-3,156,156),2)
         
@@ -184,7 +202,10 @@ class Menu_Button():
             time.sleep(0.5)
             matrix_created = True
             return
-        
+        if self.name == "Load":
+            time.sleep(0.5)
+            m.load_file()
+            return
         #For strategy selection, allows many strategies
         time.sleep(0.5)
         selected_strategy = self.name
@@ -196,13 +217,14 @@ class Menu_Button():
 
 
 def run_ui():
-    global Page1,Page2,MainGame,selected_strat,m,agent_created,matrix_created
+    global Page1,Page2,MainGame,selected_strat,m,agent_created,matrix_created,file_to_load,easy_files,medium_files
     start_b = Menu_Button("Start",(275,300))
     exit_b = Menu_Button("Exit",(275,400))
-    strat1 = Menu_Button("First",(275,300))
-    strat2 = Menu_Button("Second",(275,400))
+    strat1 = Menu_Button("Easy",(275,300))
+    strat2 = Menu_Button("Medium",(275,400))
     solve = Menu_Button("Solve!",(275,600))
     refresh = Menu_Button("Refresh",(275,660))
+    load = Menu_Button("Load",(500,650))
     
     while Page1:
         mouse = p.mouse.get_pos()
@@ -235,9 +257,16 @@ def run_ui():
                 p.display.quit()
                 p.quit()
                 
-                
-    agent = Strategy(selected_strategy)
+    if selected_strategy == "Easy":
+        print("easy selected")
+        file_to_load = easy_files
+    else:
+        file_to_load = medium_files
+        
     
+                  
+    agent = Strategy(selected_strategy)
+    print(file_to_load)
     
     input_s = p.image.load('inputS.png')
     while MainGame:
@@ -248,6 +277,7 @@ def run_ui():
         
         if matrix_created == False and agent_created==False:
             screen.blit(input_s,(100,50))
+            load.draw(mouse)
             solve.draw(mouse)
             refresh.draw(mouse)
             m.take_input(mouse)

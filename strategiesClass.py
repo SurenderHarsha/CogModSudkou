@@ -7,6 +7,9 @@ Created on Fri Apr 24 17:41:03 2020
 
 import threading
 import time
+import numpy as np
+
+from Strategy_selection import *
 
 def get_focus_data(matrix,focus):
     data = []
@@ -257,14 +260,154 @@ class backtrack():
         
         
         return self.focus
-        
     
+    
+    
+class Basic():
+    
+    def __init__(self,matrix):
+        
+        self.matrix = matrix
+        #self.lock = 0  #This decides if focus should send out an answer or just the focus point
+        self.focus = (0,0)  #The current cordinate that is being focused on
+        self.answer = (5,(0,0)) # The number and the cordinate it should be placed at
+        
+        
+        self.wait_time = 1
+        self.focus_wait = 1/10
+        self.stack = []
+        self.current_place = (0,0)
+        self.inserted = []
+        
+        t1 = threading.Thread(target=self.think)
+        t1.start()
+        
+        
+        pass
+    
+    def find_focus_path(self,i,j,x,y):
+        a = x - i
+        b = y - j
+        c_x = i
+        c_y = j
+        if a<0:
+            a_sign = -1
+        else:
+            a_sign = 1
+        if b<0:
+            b_sign = -1
+        else:
+            b_sign = 1
+        for i in range(abs(a)):
+            c_x += a_sign
+            self.focus = (c_x,c_y)
+            time.sleep(self.focus_wait)
+        for i in range(abs(b)):
+            c_y += b_sign
+            self.focus = (c_x,c_y)
+            time.sleep(self.focus_wait)
+        return
+
+    def perform_check(self):
+        time.sleep(self.focus_wait)
+        #Check part
+        check_x = self.focus[0]
+        check_y = self.focus[1]
+        digit = self.answer[0]
+        self.find_focus_path(check_x,check_y,check_x,0)
+        #Check row
+        for j in range(0,9):
+            self.focus = (check_x,j)
+            time.sleep(self.focus_wait)
+            if j == check_y:
+                continue
+            if self.matrix[check_x][j] == self.matrix[check_x][check_y]:
+                self.find_focus_path(check_x,j,check_x,check_y)
+                return -1
+        self.find_focus_path(self.focus[0],self.focus[1],check_x,check_y)
+        for i in range(0,9):
+            self.focus = (i,check_y)
+            time.sleep(self.focus_wait)
+            if i == check_x:
+                continue
+            if self.matrix[i][check_y] == self.matrix[check_x][check_y]:
+                self.find_focus_path(i,check_y,check_x,check_y)
+                return -1
+        self.find_focus_path(self.focus[0],self.focus[1],check_x,check_y)
+        t_x = int(check_x/3)*3
+        t_y = int(check_y/3)*3
+        self.find_focus_path(check_x,check_y,t_x,t_y)
+        for i in range(t_x,t_x+3):
+            for j in range(t_y,t_y+3):
+                self.focus = (i,j)
+                time.sleep(self.focus_wait)
+                if i==check_x and j == check_y:
+                    continue
+                if self.matrix[i][j] == self.matrix[check_x][check_y]:
+                    self.find_focus_path(i,j,check_x,check_y)
+                    return -1
+        return 1
+                
+                 
+    def think(self):
+        
+        time.sleep(self.wait_time)
+        counter = 1
+        done = False
+        temp_matrix = self.matrix
+        empty_cells = []
+        for i in range(9):
+            for j in range(9):
+                if self.matrix[i][j]==0:
+                    empty_cells.append((i,j))
+        if len(empty_cells)==0:
+            done = True
+        #print(empty_cells)
+        while not done:
+            if len(empty_cells)==0:
+                done = True
+                continue
+            choice = np.random.choice(list(range(len(empty_cells))))
+            new_cell = empty_cells[choice]
+            self.find_focus_path(self.focus[0],self.focus[1],new_cell[0],new_cell[1])
+            self.focus = new_cell
+            #print(self.focus)
+            dt = get_focus_data(self.matrix,self.focus)
+            
+            n,s = strategy_cycle(dt[0],dt[1],dt[2],dt[3],dt[4],dt[5],dt[6],dt[7],dt[8])
+            if n==False:
+                continue
+            print(s)
+            
+            self.matrix[self.focus[0]][self.focus[1]] = s
+            time.sleep(2)
+            self.perform_check()
+            if self.focus in empty_cells:
+                empty_cells.remove(self.focus)
+            
+            
+        return
+            
+                
+        satisfied = False
+        while not satisfied:
+            a = self.perform_check()
+            if a!=1:
+                counter+=1
+            satisfied = True
+            
+        
+    def get_focus(self):
+        
+        
+        return self.focus
 class Strategy():
     def __init__(self,name):
+        
         self.name = name
     def return_strategy(self,matrix):
-        if self.name == 'First':
-            obj = backtrack(matrix)
+        if self.name == 'Easy':
+            obj = Basic(matrix)
         
         if self.name == "Second":
             #Create the object for second strategy
