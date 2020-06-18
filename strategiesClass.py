@@ -70,13 +70,8 @@ def get_focus_data(matrix,focus):
     empty_sqr= []
     for i in range(square[0],square[0]+3):
         for j in range(square[1],square[1]+3):
-            if matrix[i][j]==0:
-                if i == int(focus[0]/3)*3:
-                    if j != int(focus[1]/3)*3:
-                        empty_sqr.append((i,j))
-                else:
-                    empty_sqr.append((i,j))
-                    
+            if matrix[i][j]==0 and i!=focus[0] and j!=focus[1]:
+                empty_sqr.append((i,j))
     data.append(empty_sqr)
     return data
     
@@ -276,10 +271,10 @@ class Basic():
         #self.lock = 0  #This decides if focus should send out an answer or just the focus point
         self.focus = (0,0)  #The current cordinate that is being focused on
         self.answer = (5,(0,0)) # The number and the cordinate it should be placed at
-        
+        self.lock = 0
         
         self.wait_time = 1
-        self.focus_wait = 1/10
+        self.focus_wait = 1/5
         self.stack = []
         self.current_place = (0,0)
         self.inserted = []
@@ -352,8 +347,18 @@ class Basic():
                     self.find_focus_path(i,j,check_x,check_y)
                     return -1
         return 1
-                
-                 
+         
+    def calc_dist(self,empty,focus):
+        dist= []
+        for i in empty:
+            dist.append((focus[0]-i[0])**2+(focus[1]-i[1])**2)
+        
+        return [x/sum(dist) for x in dist]
+    def pause(self):
+        self.lock = 1
+        return
+    def resume(self):
+        self.lock=0
     def think(self):
         
         time.sleep(self.wait_time)
@@ -368,11 +373,17 @@ class Basic():
         if len(empty_cells)==0:
             done = True
         #print(empty_cells)
+        x = 0
+        y = 0
         while not done:
+            if self.lock !=0 :
+                continue
             if len(empty_cells)==0:
                 done = True
                 continue
-            choice = np.random.choice(list(range(len(empty_cells))))
+            choice = np.random.choice(list(range(len(empty_cells))),p = self.calc_dist(empty_cells,(x,y)))
+            
+            
             
             new_cell = empty_cells[choice]
             self.find_focus_path(self.focus[0],self.focus[1],new_cell[0],new_cell[1])
@@ -390,7 +401,7 @@ class Basic():
             self.matrix[self.focus[0]][self.focus[1]] = s
             
             empty_cells.remove(self.focus)
-            time.sleep(2)
+            time.sleep(3)
             
             result = self.perform_check()
             if result == -1:
@@ -427,9 +438,10 @@ class Strategy():
         if self.name == 'Easy':
             obj = Basic(matrix.copy())
         
-        if self.name == "Second":
+        if self.name == "Medium":
+            obj = Basic(matrix.copy())
             #Create the object for second strategy
             # obj =  second_strat(matrix)
-            pass
+            
         return obj            
             

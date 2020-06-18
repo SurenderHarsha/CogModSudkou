@@ -14,9 +14,11 @@ from strategiesClass import *
 
 selected_strategy = ""
 easy_files = "Easy_Sudokus.csv"
-medium_files = "mediumsudoku.csv"
+medium_files = "Medium_Sudokus.csv"
 file_to_load = ""
 
+pause_check = False
+resume_check = False
 
 
 white = (255, 255, 255) 
@@ -53,6 +55,8 @@ Page2 = False
 MainGame = False
 matrix_created = False
 agent_created = False
+Rollback = True
+
 
 matrix = []
 for i in range(9):
@@ -201,7 +205,7 @@ class Menu_Button():
                 self.click()
         pass
     def click(self):
-        global Page1,Page2,MainGame,selected_strategy,m,matrix_created
+        global Page1,Page2,MainGame,selected_strategy,m,matrix_created,Rollback,pause_check,resume_check
         if self.name == "Start":
             time.sleep(0.5)
             Page1 = False
@@ -226,6 +230,24 @@ class Menu_Button():
             time.sleep(0.5)
             m.load_file()
             return
+        if self.name == "Menu":
+            time.sleep(0.5)
+            
+            Rollback = True
+            Page1 = True
+            Page2 = False
+            #MainGame = False
+            #matrix_created = False
+            #agent_created = False
+            return
+        if self.name == "Pause":
+            time.sleep(0.5)
+            pause_check = True
+            return
+        if self.name == "Resume":
+            time.sleep(0.5)
+            resume_check = True
+            return
         #For strategy selection, allows many strategies
         time.sleep(0.5)
         selected_strategy = self.name
@@ -237,7 +259,7 @@ class Menu_Button():
 
 
 def run_ui():
-    global Page1,Page2,MainGame,selected_strat,m,agent_created,matrix_created,file_to_load,easy_files,medium_files
+    global Page1,Page2,MainGame,selected_strat,m,agent_created,matrix_created,file_to_load,easy_files,medium_files,Rollback,pause_check,resume_check
     start_b = Menu_Button("Start",(275,300))
     exit_b = Menu_Button("Exit",(275,400))
     strat1 = Menu_Button("Easy",(275,300))
@@ -245,6 +267,9 @@ def run_ui():
     solve = Menu_Button("Solve!",(275,600))
     refresh = Menu_Button("Refresh",(275,660))
     load = Menu_Button("Load",(500,650))
+    Pause = Menu_Button("Pause",(200,660))
+    Resume = Menu_Button("Resume",(400,660))
+    Main_Menu = Menu_Button("Menu",(100,50))
     
     while Page1:
         mouse = p.mouse.get_pos()
@@ -310,10 +335,23 @@ def run_ui():
             agent_created = True
             
         if matrix_created == True and agent_created == True:
-            if once:
+            if pause_check:
+                agent.pause()
+                pause_check = False
+            if resume_check:
+                agent.resume()
+                resume_check = False
+            if Rollback:
+                matrix_created=False
+                agent_created=False
+                MainGame=False
+                return
                 #print(agent.matrix)
                 #print(m.matrix)
                 once = False
+            Pause.draw(mouse)
+            Resume.draw(mouse)
+            Main_Menu.draw(mouse)
             m.matrix = agent.matrix
             out = agent.get_focus()
             m.draw_focus(out[0],out[1])
@@ -332,4 +370,13 @@ def run_ui():
     
     p.display.quit()
     p.quit()
-run_ui()
+
+while Rollback:
+    print("Entered")
+    Rollback = False
+    run_ui()
+    matrix = []
+    for i in range(9):
+        matrix.append([0 for j in range(9)])
+    m = Matrix(matrix)
+    

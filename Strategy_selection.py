@@ -131,6 +131,6 @@ def strategy_cycle(focus,square,r1,r2,r3,c1,c2,c3,empty_sqr):
             
         if strategy_name == 'medium_strategies':
             number_solved,solution = two_out_of_three_rule(focus,square,r1,r2,r3,c1,c2,c3,empty_sqr)
-        print(strategy_name)
+        #print(strategy_name)
         return number_solved,solution
 
