@@ -174,7 +174,6 @@ def two_out_of_three_rule(focus,square,row1,row2,row3,col1,col2,col3,empty_sqr):
     
     focus_no_possible_values = np.append(list(focus_row.keys()),list(focus_column.keys()))
     focus_no_possible_values = np.append(focus_no_possible_values,list(square.keys()))
-    #print(focus_no_possible_values)
     focus_no_possible_values = np.unique(focus_no_possible_values)
     
     for number in all_possible_values:
@@ -191,12 +190,8 @@ def two_out_of_three_rule(focus,square,row1,row2,row3,col1,col2,col3,empty_sqr):
             empty_cell_no_possible_values = np.append(list(empty_cell_row.keys()),list(empty_cell_column.keys()))
             empty_cell_no_possible_values = np.append(empty_cell_no_possible_values,list(square.keys()))
             empty_cell_no_possible_values = np.unique(empty_cell_no_possible_values)
-            
-            for empty_cell_number in all_possible_values:
-                if empty_cell_number not in empty_cell_no_possible_values:
-                    empty_cell_possible_values = np.append(empty_cell_possible_values,empty_cell_number)
-                    
-            if number not in empty_cell_possible_values:
+                            
+            if number not in empty_cell_no_possible_values:
                 solved = False
         
         if solved == True:

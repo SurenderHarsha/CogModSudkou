@@ -71,7 +71,12 @@ def get_focus_data(matrix,focus):
     for i in range(square[0],square[0]+3):
         for j in range(square[1],square[1]+3):
             if matrix[i][j]==0:
-                empty_sqr.append((i,j))
+                if i == int(focus[0]/3)*3:
+                    if j != int(focus[1]/3)*3:
+                        empty_sqr.append((i,j))
+                else:
+                    empty_sqr.append((i,j))
+                    
     data.append(empty_sqr)
     return data
     
