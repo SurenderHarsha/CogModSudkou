@@ -32,7 +32,7 @@ selected_location = []
 
 
 (width, height) = (720, 720)
-fps = 30
+fps = 120
 
 
 
@@ -83,7 +83,7 @@ class Matrix():
                     selected_location[i][j]=1
     def load_file(self):
         global file_to_load
-        print(file_to_load)
+        #print(file_to_load)
         df = pd.read_csv(file_to_load)
         l = df.loc[np.random.choice(list(range(df.shape[0])))][1:].to_list()
         k = 0
@@ -131,6 +131,34 @@ class Matrix():
             for j in range(9):
                 self.matrix[i][j]=0
                 
+    def draw_score(self,c,ts,te):
+        largeText = p.font.Font('freesansbold.ttf',20)
+        TextSurf, TextRect = text_objects("Correct", largeText,blue)
+        TextRect.center = (640,100)
+        
+        screen.blit(TextSurf, TextRect)
+        TextSurf, TextRect = text_objects(":"+str(c), largeText,red)
+        TextRect.center = (700,100)
+        screen.blit(TextSurf, TextRect)
+        
+        
+        TextSurf, TextRect = text_objects("Solved", largeText,blue)
+        TextRect.center = (640,200)
+        
+        screen.blit(TextSurf, TextRect)
+        TextSurf, TextRect = text_objects(":"+str(ts), largeText,red)
+        TextRect.center = (700,200)
+        screen.blit(TextSurf, TextRect)
+        
+        TextSurf, TextRect = text_objects("Total", largeText,blue)
+        TextRect.center = (640,300)
+        
+        screen.blit(TextSurf, TextRect)
+        TextSurf, TextRect = text_objects(":"+str(te), largeText,red)
+        TextRect.center = (700,300)
+        screen.blit(TextSurf, TextRect)
+        
+        return
     def draw_focus(self,i,j):
         p.draw.rect(screen,green,(self.draw_start[0]+(j)*50+3,self.draw_start[1]+ (i)*50+3,44,44),2)
         
@@ -311,7 +339,7 @@ def run_ui():
     
                   
     agent = Strategy(selected_strategy)
-    print(file_to_load)
+    #print(file_to_load)
     once = True
     input_s = p.image.load('inputS.png')
     while MainGame:
@@ -328,9 +356,9 @@ def run_ui():
             m.take_input(mouse)
             
         if matrix_created==True and agent_created==False:
-            print(m.matrix)
+            #print(m.matrix)
             m.matrix_drawn()
-            print(m.matrix)
+            #print(m.matrix)
             agent = agent.return_strategy(m.matrix)
             agent_created = True
             
@@ -353,8 +381,10 @@ def run_ui():
             Resume.draw(mouse)
             Main_Menu.draw(mouse)
             m.matrix = agent.matrix
-            out = agent.get_focus()
+            out,c,ts,te = agent.communicate()
             m.draw_focus(out[0],out[1])
+            m.draw_score(c,ts,te)
+            
         p.display.flip()
         for event in p.event.get():
             if event.type == p.QUIT:

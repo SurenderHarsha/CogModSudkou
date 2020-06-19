@@ -274,10 +274,16 @@ class Basic():
         self.lock = 0
         
         self.wait_time = 1
-        self.focus_wait = 1/5
+        self.focus_wait = 1/15
         self.stack = []
         self.current_place = (0,0)
         self.inserted = []
+        self.solved =[]
+        self.cells = []
+        self.correct_solved = 0
+        self.total_solved = 0
+        self.total_empty = 0
+        
         
         t1 = threading.Thread(target=self.think)
         t1.start()
@@ -308,6 +314,76 @@ class Basic():
             time.sleep(self.focus_wait)
         return
 
+    def solve(self):
+        self.solved = [x[:] for x in self.matrix]
+        print(self.solved)
+        i = 0
+        j = 0
+        track = []
+        for i in range(9):
+            for j in range(9):
+                if self.solved[i][j]==0:
+                    track.append((i,j))
+        current_index = 0
+        numbers_track = [0 for x in range(len(track))]
+        
+        sol = False
+        iterations = 0
+        while not sol:
+            
+            iterations+=1
+            if current_index >= len(track):
+                sol = True
+                break
+           
+            try: 
+                numbers_track[current_index] +=1
+            except:
+                print(track)
+                numbers_track[current_index] +=1
+            if numbers_track[current_index] > 9:
+                numbers_track[current_index] = 0
+                current_index -= 1
+                continue
+            self.solved[track[current_index][0]][track[current_index][1]] = numbers_track[current_index]
+            result = self.solve_check(track[current_index][0],track[current_index][1])
+            if result == -1:
+                continue
+            else:
+                print(current_index)
+                current_index += 1
+                continue
+            
+        print(self.solved)
+        
+        pass
+    def solve_check(self,x,y):
+        #check row
+        
+        for j in range(0,9):
+            if y==j:
+                continue
+            if self.solved[x][j] == self.solved[x][y]:
+                return -1
+        #check column
+        for i in range(0,9):
+            if i==x:
+                continue
+            if self.solved[i][y] == self.solved[x][y]:
+                return -1
+        #check square
+        c_x = int(x/3)*3
+        c_y = int(y/3)*3
+        for i in range(3):
+            for j in range(3):
+                if i+c_x == x and j+c_y==y:
+                    continue
+                if self.solved[i+c_x][j+c_y] == self.solved[x][y]:
+                    return -1
+            
+        return 1
+        
+        
     def perform_check(self):
         time.sleep(self.focus_wait)
         #Check part
@@ -351,7 +427,15 @@ class Basic():
     def calc_dist(self,empty,focus):
         dist= []
         for i in empty:
-            dist.append((focus[0]-i[0])**2+(focus[1]-i[1])**2)
+            row = self.matrix[focus[0]]
+            col = [self.matrix[x][focus[1]] for x in range(9)]
+            a,b = int(focus[0]/3)*3,int(focus[1]/3)*3
+            square = []
+            for j in range(3):
+                for k in range(3):
+                    square.append(self.matrix[j+a][k+b])
+            s = 9 - square.count(0) + 9 - row.count(0) + 9 - col.count(0)
+            dist.append(s**3)
         
         return [x/sum(dist) for x in dist]
     def pause(self):
@@ -360,6 +444,12 @@ class Basic():
     def resume(self):
         self.lock=0
     def think(self):
+        self.solve()
+        for i in range(9):
+            for j in range(9):
+                if self.matrix[i][j]==0:
+                    self.cells.append((i,j))
+        self.total_empty = len(self.cells)
         
         time.sleep(self.wait_time)
         counter = 1
@@ -378,6 +468,14 @@ class Basic():
         while not done:
             if self.lock !=0 :
                 continue
+            self.correct_solved = 0
+            self.total_solved = 0
+            for i in self.cells:
+                if self.matrix[i[0]][i[1]] == self.solved[i[0]][i[1]]:
+                    self.correct_solved +=1
+            for i in self.cells:
+                if self.matrix[i[0]][i[1]] != 0 :
+                    self.total_solved +=1
             if len(empty_cells)==0:
                 done = True
                 continue
@@ -391,13 +489,14 @@ class Basic():
             #print(self.focus)
             dt = get_focus_data(self.matrix,self.focus)
             
-            n,s = strategy_cycle(dt[0],dt[1],dt[2],dt[3],dt[4],dt[5],dt[6],dt[7],dt[8])
+            n,s,name = strategy_cycle(dt[0],dt[1],dt[2],dt[3],dt[4],dt[5],dt[6],dt[7],dt[8])
             if n==False:
                 continue
-            #print(s)
+            
+            
             x = self.focus[0]
             y= self.focus[1]
-            
+            print(s,name,x,y)
             self.matrix[self.focus[0]][self.focus[1]] = s
             
             empty_cells.remove(self.focus)
@@ -409,7 +508,8 @@ class Basic():
                 self.matrix[x][y] = 0
                 
                 empty_cells.append((x,y))
-                print("Wrong Answer!")
+                
+                print("Wrong Answer!",x,y,"Number:",s)
             continue
             
             
@@ -426,10 +526,11 @@ class Basic():
             satisfied = True
             
         
-    def get_focus(self):
+    def communicate(self):
         
         
-        return self.focus
+        
+        return self.focus,self.correct_solved,self.total_solved,self.total_empty
 class Strategy():
     def __init__(self,name):
         
