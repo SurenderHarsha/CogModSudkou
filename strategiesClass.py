@@ -274,7 +274,7 @@ class Basic():
         self.lock = 0
         
         self.wait_time = 1
-        self.focus_wait = 1/15
+        self.focus_wait = 1/30
         self.stack = []
         self.current_place = (0,0)
         self.inserted = []
@@ -316,6 +316,7 @@ class Basic():
 
     def solve(self):
         self.solved = [x[:] for x in self.matrix]
+        return
         print(self.solved)
         i = 0
         j = 0
@@ -339,7 +340,7 @@ class Basic():
             try: 
                 numbers_track[current_index] +=1
             except:
-                print(track)
+                #print(track)
                 numbers_track[current_index] +=1
             if numbers_track[current_index] > 9:
                 numbers_track[current_index] = 0
@@ -350,7 +351,7 @@ class Basic():
             if result == -1:
                 continue
             else:
-                print(current_index)
+                #print(current_index)
                 current_index += 1
                 continue
             
@@ -427,6 +428,7 @@ class Basic():
     def calc_dist(self,empty,focus):
         dist= []
         for i in empty:
+            focus = i
             row = self.matrix[focus[0]]
             col = [self.matrix[x][focus[1]] for x in range(9)]
             a,b = int(focus[0]/3)*3,int(focus[1]/3)*3
@@ -434,8 +436,13 @@ class Basic():
             for j in range(3):
                 for k in range(3):
                     square.append(self.matrix[j+a][k+b])
-            s = 9 - square.count(0) + 9 - row.count(0) + 9 - col.count(0)
-            dist.append(s**3)
+            #print(square,row,col,square.count(0))
+            s =  (9-square.count(0) + 9-row.count(0) +  9-col.count(0))
+            ss = 9-square.count(0)
+            rs = 9-row.count(0)
+            cs = 9-col.count(0)
+            
+            dist.append(max(s,ss,rs,cs)**5)
         
         return [x/sum(dist) for x in dist]
     def pause(self):
@@ -463,8 +470,8 @@ class Basic():
         if len(empty_cells)==0:
             done = True
         #print(empty_cells)
-        x = 0
-        y = 0
+        x = empty_cells[0][0]
+        y = empty_cells[0][1]
         while not done:
             if self.lock !=0 :
                 continue
@@ -479,8 +486,13 @@ class Basic():
             if len(empty_cells)==0:
                 done = True
                 continue
-            choice = np.random.choice(list(range(len(empty_cells))),p = self.calc_dist(empty_cells,(x,y)))
             
+            #Select hardcoded
+            #print(self.calc_dist(empty_cells,(x,y)))
+            #choices = [x for _,x in sorted(zip(self.calc_dist(empty_cells,(x,y)),list(range(len(empty_cells)))))]
+            choice = np.random.choice(list(range(len(empty_cells))),p = self.calc_dist(empty_cells,(x,y)))
+            #print(choices)
+            #choice = choices[0]
             
             
             new_cell = empty_cells[choice]
@@ -488,7 +500,7 @@ class Basic():
             self.focus = new_cell
             #print(self.focus)
             dt = get_focus_data(self.matrix,self.focus)
-            
+            time.sleep(1)
             n,s,name = strategy_cycle(dt[0],dt[1],dt[2],dt[3],dt[4],dt[5],dt[6],dt[7],dt[8])
             if n==False:
                 continue
@@ -500,7 +512,7 @@ class Basic():
             self.matrix[self.focus[0]][self.focus[1]] = s
             
             empty_cells.remove(self.focus)
-            time.sleep(3)
+            time.sleep(2)
             
             result = self.perform_check()
             if result == -1:

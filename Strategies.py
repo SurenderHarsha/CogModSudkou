@@ -165,7 +165,7 @@ def mixed_single_possibility_rule(focus,square,row1,row2,row3,col1,col2,col3):
 ## cause we have to do diff comprobations based on the position (row or column the cell belongs to).
 def two_out_of_three_rule(focus,square,row1,row2,row3,col1,col2,col3,empty_sqr):
     solved = False
-    solution = 0
+    solution = []
     
     focus_column,focus_row = get_column_row_focus(focus,square,row1,row2,row3,col1,col2,col3)
     
@@ -193,10 +193,14 @@ def two_out_of_three_rule(focus,square,row1,row2,row3,col1,col2,col3,empty_sqr):
                             
             if number not in empty_cell_no_possible_values:
                 solved = False
+                
         
         if solved == True:
-            solution = number
-            break
-    
-    return solved, solution
+            solution.append(number)
+            
+    if len(solution)>1:
+        solved = False
+    if len(solution) == 0:
+        solution.append(0)
+    return solved, solution[0]
 

@@ -32,7 +32,7 @@ selected_location = []
 
 
 (width, height) = (720, 720)
-fps = 120
+fps = 100
 
 
 
@@ -132,30 +132,28 @@ class Matrix():
                 self.matrix[i][j]=0
                 
     def draw_score(self,c,ts,te):
+        mouse = p.mouse.get_pos()
         largeText = p.font.Font('freesansbold.ttf',20)
-        TextSurf, TextRect = text_objects("Correct", largeText,blue)
-        TextRect.center = (640,100)
+        #TextSurf, TextRect = text_objects("Remaining", largeText,blue)
+        l_b = Menu_Button("rem",(100,50),'left.png')
+        l_b.draw(mouse)
         
-        screen.blit(TextSurf, TextRect)
-        TextSurf, TextRect = text_objects(":"+str(c), largeText,red)
-        TextRect.center = (700,100)
-        screen.blit(TextSurf, TextRect)
-        
-        
-        TextSurf, TextRect = text_objects("Solved", largeText,blue)
-        TextRect.center = (640,200)
-        
-        screen.blit(TextSurf, TextRect)
-        TextSurf, TextRect = text_objects(":"+str(ts), largeText,red)
-        TextRect.center = (700,200)
+        #screen.blit(TextSurf, TextRect)
+        TextSurf, TextRect = text_objects(str(te-ts), largeText,red)
+        TextRect.center = (175,100)
         screen.blit(TextSurf, TextRect)
         
-        TextSurf, TextRect = text_objects("Total", largeText,blue)
-        TextRect.center = (640,300)
         
+        k_b = Menu_Button("rems",(300,50),'solved.png')
+        k_b.draw(mouse)
+        TextSurf, TextRect = text_objects(str(ts), largeText,red)
+        TextRect.center = (375,100)
         screen.blit(TextSurf, TextRect)
-        TextSurf, TextRect = text_objects(":"+str(te), largeText,red)
-        TextRect.center = (700,300)
+        
+        r_b = Menu_Button("remst",(500,50),'total.png')
+        r_b.draw(mouse)
+        TextSurf, TextRect = text_objects(str(te), largeText,red)
+        TextRect.center = (575,100)
         screen.blit(TextSurf, TextRect)
         
         return
@@ -212,26 +210,25 @@ class Matrix():
                         
 m = Matrix(matrix)
 class Menu_Button():
-    def __init__(self,name,pos):
+    def __init__(self,name,pos,img_name):
         self.name = name
         self.pos = pos
-        
+        self.img = img_name
         
         
     def draw(self,mouse):
         
-        p.draw.rect(screen, white,(self.pos[0],self.pos[1],150,50))
-        largeText = p.font.Font('freesansbold.ttf',20)
-        TextSurf, TextRect = text_objects(self.name, largeText,red)
-        TextRect.center = (self.pos[0]+int(150/2),self.pos[1]+int(50/2))
-        screen.blit(TextSurf, TextRect)
-        if (mouse[0] > self.pos[0]) and mouse[0] < self.pos[0]+150 and mouse[1] > self.pos[1] and mouse[1] < self.pos[1]+50:
+        button = p.image.load(self.img)
+        button = p.transform.scale(button,(150,50))
+        screen.blit(button, self.pos)
+        if (mouse[0] > self.pos[0]) and mouse[0] < self.pos[0]+100 and mouse[1] > self.pos[1] and mouse[1] < self.pos[1]+50:
             p.draw.rect(screen, blue, (self.pos[0]+3, self.pos[1]+3, 144, 44), 2)
             a = p.mouse.get_pressed()
             if a[0] == 1:
                 print(self.name)
                 self.click()
         pass
+        
     def click(self):
         global Page1,Page2,MainGame,selected_strategy,m,matrix_created,Rollback,pause_check,resume_check
         if self.name == "Start":
@@ -288,16 +285,16 @@ class Menu_Button():
 
 def run_ui():
     global Page1,Page2,MainGame,selected_strat,m,agent_created,matrix_created,file_to_load,easy_files,medium_files,Rollback,pause_check,resume_check
-    start_b = Menu_Button("Start",(275,300))
-    exit_b = Menu_Button("Exit",(275,400))
-    strat1 = Menu_Button("Easy",(275,300))
-    strat2 = Menu_Button("Medium",(275,400))
-    solve = Menu_Button("Solve!",(275,600))
-    refresh = Menu_Button("Refresh",(275,660))
-    load = Menu_Button("Load",(500,650))
-    Pause = Menu_Button("Pause",(200,660))
-    Resume = Menu_Button("Resume",(400,660))
-    Main_Menu = Menu_Button("Menu",(100,50))
+    start_b = Menu_Button("Start",(275,300),'start.png')
+    exit_b = Menu_Button("Exit",(275,400),'exit.png')
+    strat1 = Menu_Button("Easy",(275,300),'easy.png')
+    strat2 = Menu_Button("Medium",(275,400),'medium.png')
+    solve = Menu_Button("Solve!",(275,600),'solve.png')
+    refresh = Menu_Button("Refresh",(275,660),'refresh.png')
+    load = Menu_Button("Load",(500,650),'load.png')
+    Pause = Menu_Button("Pause",(300,660),'pause.png')
+    Resume = Menu_Button("Resume",(500,660),'resume.png')
+    Main_Menu = Menu_Button("Menu",(100,660),'menu.png')
     
     while Page1:
         mouse = p.mouse.get_pos()
@@ -320,7 +317,7 @@ def run_ui():
         clock.tick(fps)
         selection = p.image.load('select.png') 
         screen.fill(black)
-        screen.blit(selection,(150,100))
+        screen.blit(selection,(100,100))
         strat1.draw(mouse)
         strat2.draw(mouse)
         p.display.flip()
