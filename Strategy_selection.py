@@ -124,8 +124,8 @@ def strategy_cycle(focus,square,r1,r2,r3,c1,c2,c3,empty_sqr):
             
             for strat in sorted_ranking:
                 strategy_name_index = rankings.index(strat)
-                strategy_name = simple_strategies_list[strategy_name_index]
-                number_solved,solution = strategy_name(focus,square,r1,r2,r3,c1,c2,c3)
+                strategy_n = simple_strategies_list[strategy_name_index]
+                number_solved,solution = strategy_n(focus,square,r1,r2,r3,c1,c2,c3)
                 if number_solved == True:
                     break
             

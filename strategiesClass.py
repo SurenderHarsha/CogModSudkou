@@ -316,7 +316,7 @@ class Basic():
 
     def solve(self):
         self.solved = [x[:] for x in self.matrix]
-        return
+        
         print(self.solved)
         i = 0
         j = 0
@@ -340,7 +340,7 @@ class Basic():
             try: 
                 numbers_track[current_index] +=1
             except:
-                #print(track)
+                return
                 numbers_track[current_index] +=1
             if numbers_track[current_index] > 9:
                 numbers_track[current_index] = 0
@@ -509,10 +509,15 @@ class Basic():
             x = self.focus[0]
             y= self.focus[1]
             print(s,name,x,y)
+            if name=='simple_strategies':
+                time.sleep(2)
+            if name=='medium_strategies':
+                time.sleep(4)
             self.matrix[self.focus[0]][self.focus[1]] = s
             
             empty_cells.remove(self.focus)
-            time.sleep(2)
+            time.sleep(1)
+            
             
             result = self.perform_check()
             if result == -1:
