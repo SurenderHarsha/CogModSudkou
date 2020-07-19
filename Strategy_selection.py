@@ -15,7 +15,7 @@ from Sudoku_perception import *
 
 
 m = Model()
-max_repetitions = 50 ## The maximum number of repetitions for the same strategy.
+perseverance = 50 ## The maximum number of repetitions for the same strategy.
 
 
 # In[39]:
@@ -83,7 +83,7 @@ def next_step(chunk,number_solved = False):
     
     repetition_sensation = chunk.slots["repetitions"] + np.random.randint(1,5)
     
-    if (repetition_sensation >= max_repetitions / chunk.slots["complexity_rate"]):
+    if (repetition_sensation >= perseverance / chunk.slots["complexity_rate"]):
         chunk = change_strategy(chunk)
     elif number_solved == True:
         chunk = change_strategy(chunk,True)
