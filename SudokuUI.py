@@ -11,7 +11,13 @@ import numpy as np
 import time
 from Brain_class import *
 
+#Set this to true, if you just want to record simulation times.
+time_run = False
 
+
+
+
+#The sudoku files
 selected_strategy = ""
 easy_files = "Easy_Sudokus.csv"
 medium_files = "Medium_Sudokus.csv"
@@ -21,8 +27,8 @@ file_to_load = ""
 loaded_number = 0
 pause_check = False
 resume_check = False
-time_run = False
 
+#Defined colors
 white = (255, 255, 255) 
 black = (0,0,0)
 red = (255,0,0)
@@ -47,7 +53,7 @@ def text_objects(text, font,color):
 
 
 
-
+# Initializing the window
 p.init()
 p.display.set_caption('SudokuSolver!')
 screen = p.display.set_mode((width, height))
@@ -60,6 +66,7 @@ agent_created = False
 Rollback = True
 unsolved = True
 
+#Initializing the matrix
 matrix = []
 for i in range(9):
     matrix.append([0 for j in range(9)])
@@ -68,6 +75,7 @@ for i in range(9):
 
 clock = p.time.Clock()
 
+#Matrix class that handles the matrix in UI, loading, drawing and input functions. Including drawing score and focus
 class Matrix():
     def __init__(self,matrix):
         self.matrix = matrix
@@ -212,6 +220,8 @@ class Matrix():
                         self.matrix[i][j] = 0
                         
 m = Matrix(matrix)
+
+#Custom menu button class
 class Menu_Button():
     def __init__(self,name,pos,img_name):
         self.name = name
@@ -264,9 +274,6 @@ class Menu_Button():
             Rollback = True
             Page1 = True
             Page2 = False
-            #MainGame = False
-            #matrix_created = False
-            #agent_created = False
             return
         if self.name == "Pause":
             time.sleep(0.5)
@@ -285,7 +292,7 @@ class Menu_Button():
         
         
 
-
+#The main UI function, need the respective images to run
 def run_ui():
     global Page1,Page2,MainGame,selected_strategy,m,agent_created,matrix_created,file_to_load,easy_files,medium_files,Rollback,pause_check,resume_check,time_run,unsolved
     start_b = Menu_Button("Start",(275,300),'start.png')
@@ -298,6 +305,9 @@ def run_ui():
     Pause = Menu_Button("Pause",(300,660),'pause.png')
     Resume = Menu_Button("Resume",(500,660),'resume.png')
     Main_Menu = Menu_Button("Menu",(100,660),'menu.png')
+    
+    
+    
     if time_run:
         Page1 = False
         Page2 = False
@@ -407,16 +417,13 @@ def run_ui():
             if event.type == p.QUIT:
                 running = False
                 p.display.quit()
-                p.quit()
-    
-    
-    
-    #agent = agent.return_strategy()
-                
-                
-    
+                p.quit() 
     p.display.quit()
     p.quit()
+    
+
+
+#The main part where the UI is called and data is saved. 
 timed = pd.DataFrame(columns = ['time','solved','sudoku_number'])
 counted = 0
 while Rollback and counted<20:

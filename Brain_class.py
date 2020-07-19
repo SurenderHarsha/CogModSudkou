@@ -11,6 +11,7 @@ import numpy as np
 
 from Strategy_selection import *
 
+## A function to get all data in the focus
 def get_focus_data(matrix,focus):
     data = []
     data.append(focus)
@@ -86,7 +87,7 @@ class strategy_a():
         
         #Content for initialization
         self.matrix = matrix
-        self.lock = 0  #This decides if focus should send out an answer or just the focus point
+        self.lock = 0  #This decides if the simulation should be paused
         self.focus = (0,0)  #The current cordinate that is being focused on
         self.answer = (0,(0,0)) # The number and the cordinate it should be placed at
         #-----------------------------Do any extra initialization here --------------------------------------------------
@@ -104,179 +105,30 @@ class strategy_a():
     def think(self):
         #This is your main thinking strategy function, here you will write logic for your code
         #Always update the focus when you are looking at a cell. This will run in a thread, so it will happen parallely
-        #Always release the lock after you are ready to provide an answer (make lock=1)
+    
         pass
-    
-    
-    
-    def focus(self): This is the important function to communicate between the environment and the model
-    
-        
-        #This function will be called every second.
-        #Two Return types.
-        
-        #1.) First return type are cordinates (x,y) = (row,column) in the matrix which shows where the vision of agent
-        #    is(or the focus of the agent as it looks at numbers). 
-        #2.) The output number and its position where you want to place it, Update the matrix locally.
-        #Look at the example strategy below to get a better understanding.
-        
-        if self.lock == 0:
-            return self.focus
-        else:
-            lock = 0
-            t1 = threading.Thread(target=self.think)
-            t1.start()
-            return self.answer
-    
-    
-    
-    
+      
 
 '''
 
-#Example Strategy
-class backtrack():
 
-    def __init__(self,matrix):
-        
-        self.matrix = matrix
-        #self.lock = 0  #This decides if focus should send out an answer or just the focus point
-        self.focus = (0,0)  #The current cordinate that is being focused on
-        self.answer = (5,(0,0)) # The number and the cordinate it should be placed at
-        
-        
-        self.wait_time = 1
-        self.focus_wait = 1/2
-        self.stack = []
-        self.current_place = (0,0)
-        self.inserted = []
-        
-        t1 = threading.Thread(target=self.think)
-        t1.start()
-        
-        
-        pass
-    
-    #Helper Function
-    def find_focus_path(self,i,j,x,y):
-        a = x - i
-        b = y - j
-        c_x = i
-        c_y = j
-        if a<0:
-            a_sign = -1
-        else:
-            a_sign = 1
-        if b<0:
-            b_sign = -1
-        else:
-            b_sign = 1
-        for i in range(abs(a)):
-            c_x += a_sign
-            self.focus = (c_x,c_y)
-            time.sleep(self.focus_wait)
-        for i in range(abs(b)):
-            c_y += b_sign
-            self.focus = (c_x,c_y)
-            time.sleep(self.focus_wait)
-        return
-    
-    
-    def perform_check(self):
-        self.focus_wait = 1/5
-        time.sleep(self.focus_wait)
-        #Check part
-        check_x = self.focus[0]
-        check_y = self.focus[1]
-        digit = self.answer[0]
-        self.find_focus_path(check_x,check_y,check_x,0)
-        #Check row
-        for j in range(0,9):
-            self.focus = (check_x,j)
-            time.sleep(self.focus_wait)
-            if j == check_y:
-                continue
-            if self.matrix[check_x][j] == self.matrix[check_x][check_y]:
-                self.find_focus_path(check_x,j,check_x,check_y)
-                return -1
-        self.find_focus_path(self.focus[0],self.focus[1],check_x,check_y)
-        for i in range(0,9):
-            self.focus = (i,check_y)
-            time.sleep(self.focus_wait)
-            if i == check_x:
-                continue
-            if self.matrix[i][check_y] == self.matrix[check_x][check_y]:
-                self.find_focus_path(i,check_y,check_x,check_y)
-                return -1
-        self.find_focus_path(self.focus[0],self.focus[1],check_x,check_y)
-        t_x = int(check_x/3)*3
-        t_y = int(check_y/3)*3
-        self.find_focus_path(check_x,check_y,t_x,t_y)
-        for i in range(t_x,t_x+3):
-            for j in range(t_y,t_y+3):
-                self.focus = (i,j)
-                time.sleep(self.focus_wait)
-                if i==check_x and j == check_y:
-                    continue
-                if self.matrix[i][j] == self.matrix[check_x][check_y]:
-                    self.find_focus_path(i,j,check_x,check_y)
-                    return -1
-        return 1
-                
-                 
-    def think(self):
-        #This is your main strategy code - My fake strategy doesnt use ACT-R.
-        time.sleep(self.wait_time)
-        counter = 1
-        done = 0
-        temp_matrix = self.matrix
-        for i in range(9):
-            for j in range(9):
-                self.focus = (i,j)
-                time.sleep(self.focus_wait)
-                if self.matrix[i][j] == 0:
-                    #self.answer = (counter,(i,j))
-                    self.matrix[i][j] = counter
-                    self.stack.append(counter)
-                    self.inserted.append((i,j))
-                    done=1
-                    break
-            if done==1:
-                break
-        satisfied = False
-        while not satisfied:
-            a = self.perform_check()
-            if a!=1:
-                counter+=1
-            satisfied = True
-            
-                    
-        
-        
-        
-        
-        
-        
-    def get_focus(self):
-        
-        
-        return self.focus
-    
-    
-    
+# The basic brain class 
 class Basic():
     
     def __init__(self,matrix):
         
         self.matrix = matrix
-        #self.lock = 0  #This decides if focus should send out an answer or just the focus point
         self.focus = (0,0)  #The current cordinate that is being focused on
-        self.answer = (5,(0,0)) # The number and the cordinate it should be placed at
+        self.answer = (5,(0,0)) # The number and the cordinate it should be placed at, not implemented
         self.lock = 0
         
+        #Variables initialization
         self.wait_time = 1
         self.thread_break = 1
+        
+        #Movespeed between cells
         self.focus_wait = np.random.uniform(1/50,1/20)
+        
         self.stack = []
         self.current_place = (0,0)
         self.inserted = []
@@ -286,13 +138,15 @@ class Basic():
         self.total_solved = 0
         self.total_empty = 0
         
-        
+        #Starting the thread
         self.t1 = threading.Thread(target=self.think)
         self.t1.start()
         
         
         pass
     
+    
+    #This is the function that moves the focus from current place to destination cell-by-cell
     def find_focus_path(self,i,j,x,y):
         a = x - i
         b = y - j
@@ -316,10 +170,12 @@ class Basic():
             time.sleep(self.focus_wait)
         return
 
+
+    #Buggy function, not used.
     def solve(self):
         self.solved = [x[:] for x in self.matrix]
         return
-        #print(self.solved)
+    
         i = 0
         j = 0
         track = []
@@ -353,13 +209,13 @@ class Basic():
             if result == -1:
                 continue
             else:
-                #print(current_index)
+                
                 current_index += 1
                 continue
-            
-        #print(self.solved)
-        
         pass
+    
+    
+    #Buggy function, not used.
     def solve_check(self,x,y):
         #check row
         
@@ -386,9 +242,10 @@ class Basic():
             
         return 1
         
-        
+    
+    #Checking if a solution is correct or not. cell-by-cell movement.
     def perform_check(self):
-        #self.focus_wait = 1/6
+        
         time.sleep(self.focus_wait)
         #Check part
         check_x = self.focus[0]
@@ -405,6 +262,7 @@ class Basic():
                 self.find_focus_path(check_x,j,check_x,check_y)
                 return -1
         self.find_focus_path(self.focus[0],self.focus[1],check_x,check_y)
+        #Check column
         for i in range(0,9):
             self.focus = (i,check_y)
             time.sleep(self.focus_wait)
@@ -413,10 +271,12 @@ class Basic():
             if self.matrix[i][check_y] == self.matrix[check_x][check_y]:
                 self.find_focus_path(i,check_y,check_x,check_y)
                 return -1
+        
         self.find_focus_path(self.focus[0],self.focus[1],check_x,check_y)
         t_x = int(check_x/3)*3
         t_y = int(check_y/3)*3
         self.find_focus_path(check_x,check_y,t_x,t_y)
+        #Check square
         for i in range(t_x,t_x+3):
             for j in range(t_y,t_y+3):
                 self.focus = (i,j)
@@ -428,6 +288,8 @@ class Basic():
                     return -1
         return 1
          
+    
+    #Calculate probability distribution of all empty cells(Higher density of numbers = higher probability)
     def calc_dist(self,empty,focus):
         dist= []
         for i in empty:
@@ -448,23 +310,34 @@ class Basic():
             dist.append(max(s,ss,rs,cs)**5)
         
         return [x/sum(dist) for x in dist]
+    
+    #Functions to pause or resume that can lock the thread.
     def pause(self):
         self.lock = 1
         return
     def resume(self):
         self.lock=0
+        
+    #The main think function 
     def think(self):
+        
+        
+        #Unimplemented function, the function is run to satisfy dependency for another variable
         self.solve()
+        
+        
+        #Programatically countin empty cells, can be used for a future update
         for i in range(9):
             for j in range(9):
                 if self.matrix[i][j]==0:
                     self.cells.append((i,j))
-        self.total_empty = len(self.cells)
-        
+        self.total_empty = len(self.cells)  
         time.sleep(self.wait_time)
         counter = 1
+        
         done = False
         temp_matrix = self.matrix
+        #Storing empty cells
         empty_cells = []
         for i in range(9):
             for j in range(9):
@@ -472,17 +345,25 @@ class Basic():
                     empty_cells.append((i,j))
         if len(empty_cells)==0:
             done = True
-        #print(empty_cells)
+        
         x = empty_cells[0][0]
         y = empty_cells[0][1]
+        
+        #Run solving until done
         while not done:
+            
+            #This is implemented to stop the thread by setting thread_break to 0.
             try:
                 if 1/self.thread_break:
                     pass
             except:
                 return
+        
+            #If the lock is active, the program waits.
             if self.lock !=0 :
                 continue
+            
+            #Not important, can be implemented in a future update
             self.correct_solved = 0
             self.total_solved = 0
             for i in self.cells:
@@ -491,47 +372,55 @@ class Basic():
             for i in self.cells:
                 if self.matrix[i[0]][i[1]] != 0 :
                     self.total_solved +=1
+                    
+                    
+                    
+                  
             if len(empty_cells)==0:
                 done = True
                 continue
             
-            #Select hardcoded
-            #print(self.calc_dist(empty_cells,(x,y)))
-            #choices = [x for _,x in sorted(zip(self.calc_dist(empty_cells,(x,y)),list(range(len(empty_cells)))))]
+            #Choosing an emtpy cell based on the probability distribution
             choice = np.random.choice(list(range(len(empty_cells))),p = self.calc_dist(empty_cells,(x,y)))
-            #print(choices)
-            #choice = choices[0]
-            
             
             new_cell = empty_cells[choice]
+            #Move to the new focus/empty cell
             self.find_focus_path(self.focus[0],self.focus[1],new_cell[0],new_cell[1])
             self.focus = new_cell
-            #print(self.focus)
+            
+            #Obtain focus data
             dt = get_focus_data(self.matrix,self.focus)
             time.sleep(0.1)
+            
+            #Call strategy selection and solve cell
             n,s,name = strategy_cycle(dt[0],dt[1],dt[2],dt[3],dt[4],dt[5],dt[6],dt[7],dt[8])
+            
+            #Wait time for strategies and fatigue implemented
             if name=='simple_strategies':
                 time.sleep(np.random.randint(1,10))
                 self.focus_wait += 1/500
             if name=='medium_strategies':
                 time.sleep(np.random.randint(3,20))
                 self.focus_wait += 1/400
+                
+            #If solution is wrong, try again
             if n==False:
                 continue
             
             
             x = self.focus[0]
             y= self.focus[1]
-            #print(s,name,x,y)
             
+            #Set solution in the matrix
             self.matrix[self.focus[0]][self.focus[1]] = s
             
             empty_cells.remove(self.focus)
             time.sleep(0.2)
             
-            
+            #Perform a check if the solution fits the cell.
             result = self.perform_check()
-            #self.focus_wait += np.random.uniform(1/400,1/250)
+            
+            #If solution doesnt fit, that means the strategy function has failed. Retry.
             if result == -1:
                 self.find_focus_path(self.focus[0],self.focus[1],x,y)
                 self.matrix[x][y] = 0
@@ -542,25 +431,15 @@ class Basic():
                 self.focus_wait += 1
             continue
             
-            
-            print(len(empty_cells))
-            
         return
             
-                
-        satisfied = False
-        while not satisfied:
-            a = self.perform_check()
-            if a!=1:
-                counter+=1
-            satisfied = True
             
-        
+    #Placeholder for better understanding   
     def communicate(self):
-        
-        
-        
         return self.focus,self.correct_solved,self.total_solved,self.total_empty
+    
+    
+#For now same brain class is used for both levels, can be improved in future updates
 class Strategy():
     def __init__(self,name):
         
