@@ -17,9 +17,11 @@ easy_files = "Easy_Sudokus.csv"
 medium_files = "Medium_Sudokus.csv"
 file_to_load = ""
 
+
+loaded_number = 0
 pause_check = False
 resume_check = False
-
+time_run = False
 
 white = (255, 255, 255) 
 black = (0,0,0)
@@ -56,7 +58,7 @@ MainGame = False
 matrix_created = False
 agent_created = False
 Rollback = True
-
+unsolved = True
 
 matrix = []
 for i in range(9):
@@ -82,10 +84,11 @@ class Matrix():
                     #print("Marking")
                     selected_location[i][j]=1
     def load_file(self):
-        global file_to_load
+        global file_to_load,loaded_number
         #print(file_to_load)
         df = pd.read_csv(file_to_load)
-        l = df.loc[np.random.choice(list(range(df.shape[0])))][1:].to_list()
+        loaded_number = np.random.choice(list(range(df.shape[0])))
+        l = df.loc[loaded_number][1:].to_list()
         k = 0
         for i in range(9):
             for j in range(9):
@@ -284,7 +287,7 @@ class Menu_Button():
 
 
 def run_ui():
-    global Page1,Page2,MainGame,selected_strat,m,agent_created,matrix_created,file_to_load,easy_files,medium_files,Rollback,pause_check,resume_check
+    global Page1,Page2,MainGame,selected_strategy,m,agent_created,matrix_created,file_to_load,easy_files,medium_files,Rollback,pause_check,resume_check,time_run,unsolved
     start_b = Menu_Button("Start",(275,300),'start.png')
     exit_b = Menu_Button("Exit",(275,400),'exit.png')
     strat1 = Menu_Button("Easy",(275,300),'easy.png')
@@ -295,7 +298,11 @@ def run_ui():
     Pause = Menu_Button("Pause",(300,660),'pause.png')
     Resume = Menu_Button("Resume",(500,660),'resume.png')
     Main_Menu = Menu_Button("Menu",(100,660),'menu.png')
-    
+    if time_run:
+        Page1 = False
+        Page2 = False
+        MainGame = True
+        selected_strategy = "Easy"
     while Page1:
         mouse = p.mouse.get_pos()
         clock.tick(fps)
@@ -328,17 +335,20 @@ def run_ui():
                 p.quit()
                 
     if selected_strategy == "Easy":
-        print("easy selected")
+        #print("easy selected")
         file_to_load = easy_files
     else:
         file_to_load = medium_files
         
     
-                  
+    
     agent = Strategy(selected_strategy)
     #print(file_to_load)
     once = True
     input_s = p.image.load('inputS.png')
+    if time_run:
+        m.load_file()
+        matrix_created=True
     while MainGame:
         mouse = p.mouse.get_pos()
         clock.tick(fps)
@@ -366,7 +376,17 @@ def run_ui():
             if resume_check:
                 agent.resume()
                 resume_check = False
+                
+                
+            if time_run:
+                if agent.focus_wait >= 2:
+                    Rollback = True
+                    print("Unsolved")
+                if sum(e.count(0) for e in m.matrix)<=0:
+                    Rollback = True
+                    unsolved = False
             if Rollback:
+                agent.thread_break = 0
                 matrix_created=False
                 agent_created=False
                 MainGame=False
@@ -397,13 +417,25 @@ def run_ui():
     
     p.display.quit()
     p.quit()
-
-while Rollback:
+timed = pd.DataFrame(columns = ['time','solved','sudoku_number'])
+counted = 0
+while Rollback and counted<20:
     print("Entered")
     Rollback = False
+    unsolved = True
+    start = time.time()
+
+
     run_ui()
+    end = time.time()
+    timed.loc[timed.shape[0]]= [(end - start)/60.0,not unsolved,loaded_number]
+    print((end-start)/60)
+    
     matrix = []
     for i in range(9):
         matrix.append([0 for j in range(9)])
     m = Matrix(matrix)
     
+    counted +=1
+if time_run:
+    timed.to_csv("TimingResultsEasy.csv")

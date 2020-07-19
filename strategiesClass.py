@@ -146,7 +146,7 @@ class backtrack():
         
         
         self.wait_time = 1
-        self.focus_wait = 1/10
+        self.focus_wait = 1/2
         self.stack = []
         self.current_place = (0,0)
         self.inserted = []
@@ -183,6 +183,7 @@ class backtrack():
     
     
     def perform_check(self):
+        self.focus_wait = 1/5
         time.sleep(self.focus_wait)
         #Check part
         check_x = self.focus[0]
@@ -274,7 +275,8 @@ class Basic():
         self.lock = 0
         
         self.wait_time = 1
-        self.focus_wait = 1/30
+        self.thread_break = 1
+        self.focus_wait = np.random.uniform(1/50,1/20)
         self.stack = []
         self.current_place = (0,0)
         self.inserted = []
@@ -285,8 +287,8 @@ class Basic():
         self.total_empty = 0
         
         
-        t1 = threading.Thread(target=self.think)
-        t1.start()
+        self.t1 = threading.Thread(target=self.think)
+        self.t1.start()
         
         
         pass
@@ -316,8 +318,8 @@ class Basic():
 
     def solve(self):
         self.solved = [x[:] for x in self.matrix]
-        
-        print(self.solved)
+        return
+        #print(self.solved)
         i = 0
         j = 0
         track = []
@@ -355,7 +357,7 @@ class Basic():
                 current_index += 1
                 continue
             
-        print(self.solved)
+        #print(self.solved)
         
         pass
     def solve_check(self,x,y):
@@ -386,6 +388,7 @@ class Basic():
         
         
     def perform_check(self):
+        #self.focus_wait = 1/6
         time.sleep(self.focus_wait)
         #Check part
         check_x = self.focus[0]
@@ -473,6 +476,11 @@ class Basic():
         x = empty_cells[0][0]
         y = empty_cells[0][1]
         while not done:
+            try:
+                if 1/self.thread_break:
+                    pass
+            except:
+                return
             if self.lock !=0 :
                 continue
             self.correct_solved = 0
@@ -500,26 +508,30 @@ class Basic():
             self.focus = new_cell
             #print(self.focus)
             dt = get_focus_data(self.matrix,self.focus)
-            time.sleep(1)
+            time.sleep(0.1)
             n,s,name = strategy_cycle(dt[0],dt[1],dt[2],dt[3],dt[4],dt[5],dt[6],dt[7],dt[8])
+            if name=='simple_strategies':
+                time.sleep(np.random.randint(1,10))
+                self.focus_wait += 1/500
+            if name=='medium_strategies':
+                time.sleep(np.random.randint(3,20))
+                self.focus_wait += 1/400
             if n==False:
                 continue
             
             
             x = self.focus[0]
             y= self.focus[1]
-            print(s,name,x,y)
-            if name=='simple_strategies':
-                time.sleep(2)
-            if name=='medium_strategies':
-                time.sleep(4)
+            #print(s,name,x,y)
+            
             self.matrix[self.focus[0]][self.focus[1]] = s
             
             empty_cells.remove(self.focus)
-            time.sleep(1)
+            time.sleep(0.2)
             
             
             result = self.perform_check()
+            #self.focus_wait += np.random.uniform(1/400,1/250)
             if result == -1:
                 self.find_focus_path(self.focus[0],self.focus[1],x,y)
                 self.matrix[x][y] = 0
@@ -527,6 +539,7 @@ class Basic():
                 empty_cells.append((x,y))
                 
                 print("Wrong Answer!",x,y,"Number:",s)
+                self.focus_wait += 1
             continue
             
             
