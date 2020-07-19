@@ -9,7 +9,7 @@ import pygame as p
 import pandas as pd
 import numpy as np
 import time
-from strategiesClass import *
+from Brain_class import *
 
 
 selected_strategy = ""
